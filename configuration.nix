@@ -17,7 +17,41 @@
   # networking.hostName = "nixos"; # Define your hostname.
 
   # Configure network connections interactively with nmcli or nmtui.
-  networking.networkmanager.enable = true;
+  # networking.networkmanager.enable = true;
+ 
+  # Use systemd-networkd instead of NetworkManager
+#  networking = {
+#    useDHCP = true;
+#    useNetworkd = true;
+#    interfaces = {
+#      enp1s0 = {
+#        useDHCP = false;
+#        ipv4.addresses = [{
+#          address = "10.207.123.123";
+#          prefixLength = 16;
+#        }];        
+#      };
+#    };
+#  };
+
+  # Assign IP address to interface
+  networking.useNetworkd = true;
+  systemd.network.networks."10-eth-int-a" = {
+      matchConfig.Name = "eth_int_a";
+      address = [ "192.168.123.123/16" ];
+      networkConfig = {
+        ConfigureWithoutCarrier = true;
+      };
+      linkConfig = {
+        RequiredForOnline = "no";
+      };
+  };
+
+  # Rename interface
+  systemd.network.links."10-eth-int-a" = {
+    matchConfig.MACAddress = "aa:bb:cc:dd:ee:ff";
+    linkConfig.Name = "eth_int_a";
+  };
 
   # Set your time zone.
   # time.timeZone = "Europe/Amsterdam";
